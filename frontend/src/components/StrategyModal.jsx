@@ -49,7 +49,7 @@ const StrategyModal = ({ show, onHide, onSave }) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'symbol' ? value.toUpperCase() : value
     }));
   }, []);
 
@@ -162,7 +162,7 @@ const StrategyModal = ({ show, onHide, onSave }) => {
   return (
     <Modal show={show} onHide={onHide} className="text-white" size="lg" data-bs-theme="dark">
       <Modal.Header closeButton>
-        <Modal.Title>Nova Estratégia</Modal.Title>
+        <Modal.Title>New Backtest</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
