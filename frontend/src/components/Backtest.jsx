@@ -7,34 +7,41 @@ import StrategyTable from './StrategyTable';
 
 function Backtest() {
   const [showImageModal, setShowImageModal] = useState(false);
-  const [showStrategyModal, setShowStrategyModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
+  const [editingStrategy, setEditingStrategy] = useState(null);
+  const [showStrategyModal, setShowStrategyModal] = useState(false);
 
   const handleOpenStrategyModal = () => {
-    console.log('Abrindo modal de estratégia');
     setShowStrategyModal(true);
   };
 
   const handleCloseStrategyModal = () => {
-    console.log('Fechando modal de estratégia');
     setShowStrategyModal(false);
   };
 
   const handleOpenImageModal = (imageData) => {
-    console.log('Abrindo modal de imagem');
     setSelectedImage(imageData);
     setShowImageModal(true);
   };
 
   const handleCloseImageModal = () => {
-    console.log('Fechando modal de imagem');
     setShowImageModal(false);
   };
 
   const handleStrategySave = useCallback((newStrategy) => {
-    console.log('Estratégia salva:', newStrategy);
+    return;
     // Implementar lógica de atualização da tabela, se necessário
   }, []);
+
+  const handleEdit = (strategy) => {
+    setEditingStrategy(strategy);
+    setShowStrategyModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowStrategyModal(false);
+    setEditingStrategy(null);
+  };
 
   return (
     <Container className="mt-4" data-bs-theme="dark">
@@ -55,11 +62,12 @@ function Backtest() {
 
       <StrategyModal
         show={showStrategyModal}
-        onHide={handleCloseStrategyModal}
+        onHide={handleModalClose}
         onSave={handleStrategySave}
+        editData={editingStrategy}
       />
 
-      <StrategyTable />
+      <StrategyTable onEdit={handleEdit} showStrategyModal={showStrategyModal} />
     </Container>
   );
 }

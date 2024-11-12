@@ -7,8 +7,6 @@ const ImageModal = ({ show, onHide, imageData, mimeType = 'png' }) => {
   );
 
   useEffect(() => {
-    console.log('Tipo de imageData:', typeof imageData);
-    console.log('Conteúdo de imageData:', imageData);
 
     if (imageData) {
 

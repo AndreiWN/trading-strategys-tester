@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Modal, Button, Form, Spinner } from 'react-bootstrap';
 import { API_URL } from '../const';
 
-const StrategyModal = ({ show, onHide, onSave }) => {
+const StrategyModal = ({ show, onHide, onSave, editData = null }) => {
   const [formData, setFormData] = useState({
     symbol: '',
     symbol_type: '',
@@ -25,25 +25,29 @@ const StrategyModal = ({ show, onHide, onSave }) => {
   // Resetar o formulário sempre que o modal for aberto
   useEffect(() => {
     if (show) {
-      setFormData({
-        symbol: '',
-        symbol_type: '',
-        strategy_name: '',
-        period_test: '',
-        total_trades: '',
-        profit_factor: '',
-        sharpe_ratio: '',
-        recovery_factor: '',
-        win_rate: '',
-        set_file: '',
-        capital_curve: ''
-      });
+      if (editData) {
+        setFormData(editData);
+      } else {
+        setFormData({
+          symbol: '',
+          symbol_type: '',
+          strategy_name: '',
+          period_test: '',
+          total_trades: '',
+          profit_factor: '',
+          sharpe_ratio: '',
+          recovery_factor: '',
+          win_rate: '',
+          set_file: '',
+          capital_curve: ''
+        });
+      }
       setIsLoading({
         set_file: false,
         capital_curve: false
       });
     }
-  }, [show]);
+  }, [show, editData]);
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -130,15 +134,20 @@ const StrategyModal = ({ show, onHide, onSave }) => {
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
 
-    // Verificar se todos os arquivos foram processados
     if (isLoading.set_file || isLoading.capital_curve) {
       alert('Por favor, aguarde até que todos os arquivos sejam processados.');
       return;
     }
 
     try {
-      const response = await fetch(`${API_URL}backtest`, {
-        method: 'POST',
+      const url = editData 
+        ? `${API_URL}backtest/${editData.id}`
+        : `${API_URL}backtest`;
+      
+      const method = editData ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -146,23 +155,22 @@ const StrategyModal = ({ show, onHide, onSave }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Erro ao salvar estratégia');
+        throw new Error(editData ? 'Erro ao atualizar estratégia' : 'Erro ao salvar estratégia');
       }
 
       const data = await response.json();
       onSave(data);
       onHide();
-      // Não é necessário resetar o formData aqui se já estamos resetando no useEffect
     } catch (error) {
       console.error('Erro:', error);
-      alert('Erro ao salvar estratégia');
+      alert(error.message);
     }
-  }, [formData, onSave, onHide, isLoading]);
+  }, [formData, onSave, onHide, isLoading, editData]);
 
   return (
     <Modal show={show} onHide={onHide} className="text-white" size="lg" data-bs-theme="dark">
       <Modal.Header closeButton>
-        <Modal.Title>New Backtest</Modal.Title>
+        <Modal.Title>{editData ? 'Edit Backtest' : 'New Backtest'}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
@@ -191,6 +199,7 @@ const StrategyModal = ({ show, onHide, onSave }) => {
               <option value="Forex">Forex</option>
               <option value="Ações">Ações</option>
               <option value="Indices">Indices</option>
+              <option value="Crypto">Crypto</option>
               <option value="Commodities">Commodities</option>
             </Form.Select>
           </Form.Group>

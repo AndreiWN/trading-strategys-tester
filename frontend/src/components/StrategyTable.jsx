@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Form, Row, Col } from 'react-bootstrap';
 import ImageModal from './ImageModal';
 import { API_URL } from '../const';
-import { FaChartLine, FaDownload, FaTrash, FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
+import { FaChartLine, FaDownload, FaTrash, FaSort, FaSortUp, FaSortDown, FaEdit } from 'react-icons/fa';
 
-const StrategyTable = (props) => {
+const StrategyTable = ({ onEdit, showStrategyModal }) => {
   const [strategies, setStrategies] = useState([]);
   const [filteredStrategies, setFilteredStrategies] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -34,7 +34,7 @@ const StrategyTable = (props) => {
     };
 
     fetchStrategies();
-  }, [showModal, props]);
+  }, [showStrategyModal]);
 
   // Função para aplicar filtros
   useEffect(() => {
@@ -225,9 +225,6 @@ const StrategyTable = (props) => {
             <th onClick={() => handleSort('sharpe_ratio')} style={{ cursor: 'pointer' }}>
               Sharpe Ratio {renderSortIcon('sharpe_ratio')}
             </th>
-            <th onClick={() => handleSort('recovery_factor')} style={{ cursor: 'pointer' }}>
-              Recovery Factor {renderSortIcon('recovery_factor')}
-            </th>
             <th onClick={() => handleSort('win_rate')} style={{ cursor: 'pointer' }}>
               Win Rate {renderSortIcon('win_rate')}
             </th>
@@ -245,7 +242,6 @@ const StrategyTable = (props) => {
                 <td>{strategy.total_trades}</td>
                 <td>{strategy.profit_factor}</td>
                 <td>{strategy.sharpe_ratio}</td>
-                <td>{strategy.recovery_factor}</td>
                 <td>{strategy.win_rate}%</td>
                 <td>
                   <Button 
@@ -267,9 +263,17 @@ const StrategyTable = (props) => {
                   <Button 
                     variant="danger" 
                     size="sm"
+                    className="me-2"
                     onClick={() => handleDelete(strategy.id)}
                   >
                     <FaTrash />
+                  </Button>
+                  <Button 
+                    variant="warning" 
+                    size="sm" 
+                    onClick={() => onEdit(strategy)}
+                  >
+                    <FaEdit />
                   </Button>
                 </td>
               </tr>
